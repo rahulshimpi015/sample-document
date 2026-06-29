@@ -1,0 +1,160 @@
+<!--
+  @description       : Capture Personal Details
+  @author            : Sathishkumar MT/Anamika
+  @last modified on  : 06-26-2026
+  @last modified by  : ChangeMeIn@UserSettingsUnder.SFDoc
+-->
+<template>
+  <div class="ngcx-page-content ngcx-new-registration-section">
+    <!-- <div class="ngcx-spacer--height"></div> -->
+    <header data-id="divBackContainer" class="ngcx-spacer--11x">
+      <div class="ngcx-header">
+        <div data-id="divBack" class="ngcx-header__back">
+          <button onclick={handleBackButton} aria-label="back button" class="ngcx-btn--transparent ngcx-border--none">
+            <img src={back_icon} class="ngcx-headerArrow__icon ngcx-icon--default" alt="back button" />
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="ngcx-body-title ngcx-margintop--2point5">
+      <h1 role="heading" aria-level="1" class="ngcx-heading ngcx-text--center ngcx-marginbottom--8x" data-id="txtHeading">
+        {signUpPageName}
+      </h1>
+      <p class="ngcx-text__body-text ngcx-text__font-weight-regular ngcx-marginbottom--0x">
+        {signUpPageMsg}
+      </p>
+    </div>
+
+    <!-- Personal Name -->
+    <template lwc:if={displayPersonName}>
+      <div class="ngcx-form">
+        <div class="ngcx-form__fields">
+          <input type="text" data-id="txtFirstname" id="txtFirstname" name="txtFirstname"
+            class="ngcx-form__input" placeholder=" " autocomplete="off" maxlength="255"
+            value={firstName}
+            onkeyup={enablebtnContinuePersonal}
+            onkeypress={handleFirstnameEvent}
+            oninput={handleChangeFirstName} />
+          <label class="ngcx-form__label" for="txtFirstname">First name</label>
+        </div>
+        <div class="ngcx-form__fields">
+          <input type="text" data-id="txtLastname" id="txtLastname" name="txtLastname"
+            class="ngcx-form__input" placeholder=" " autocomplete="off" maxlength="255"
+            value={lastName}
+            onkeypress={handleLastnameEvent}
+            onkeyup={enablebtnContinuePersonal}
+            oninput={handleChangeLastName} />
+          <label class="ngcx-form__label" for="txtLastname">Last name</label>
+        </div>
+      </div>
+    </template>
+
+    <!-- Date of Birth -->
+    <template lwc:if={displayDob}>
+      <div class="ngcx-form">
+        <c-ngcx_-input-date
+          onchangedatevalue={handleChangeDateValue}
+          text-date-value={personBirthdate}>
+        </c-ngcx_-input-date>
+      </div>
+    </template>
+
+    <!-- Plan Number -->
+    <template lwc:if={displayPlanNumber}>
+      <div class="ngcx-form">
+        <div class="ngcx-form__fields">
+          <input type="text" data-id="txtSJPPlan" id="txtSJPPlan" name="txtSJPPlan"
+            class="ngcx-form__input" placeholder=" " autocomplete="off" maxlength="80"
+            value={sjpPlanNum}
+            onkeyup={enablebtnContinuePersonal}
+            onkeypress={handleSJPPlanEvent}
+            oninput={handleChangeSJPPlan} />
+          <label class="ngcx-form__label" for="txtSJPPlan">Any of your plan numbers</label>
+        </div>
+        <!-- FIX 5: Added missing data-id="btnWhereCanI" -->
+        <button type="button" data-id="btnWhereCanI" onclick={setisModalOpen} tabindex="0"
+          class="ngcx-text-functional ngcx-button-text-link"
+          aria-label="Click here for Forgotten details">
+          Where can I find this?
+        </button>
+      </div>
+    </template>
+
+    <!-- NI Number -->
+    <template lwc:if={displayNino}>
+      <div class="ngcx-form">
+        <div class="ngcx-form__fields">
+          <!-- FIX 6: onchange now points to renamed handleChangeNino -->
+          <input type="text" data-id="txtNino" id="txtNino" name="txtNino"
+            class="ngcx-form__input" placeholder=" " autocomplete="off" maxlength="80"
+            value={nino}
+            disabled={disabledNinoInput}
+            onkeyup={enablebtnContinuePersonal}
+            onkeypress={handleNinoEvent}
+            oninput={handleChangeNino} />
+          <label class="ngcx-form__label" for="txtNino">NI Number</label>
+        </div>
+      </div>
+      <div class="ngcx-form__checkbox-group ngcx-margintop--8x">
+        <input data-id="chkTandC" id="chkTandC" type="checkbox" name="statusCheckbox"
+          oninput={handlecheckBox} class="ngcx-form__checkbox-btn"
+          checked={isNinoNotPresent} 
+          disabled={disabledCheckbox}/>
+        <label for="chkTandC" class="ngcx-text-body">I don't have an NI number</label>
+      </div>
+    </template>
+
+    <!-- US Resident -->
+    <template lwc:if={displayUsResident}>
+      <div class="ngcx-form">
+        <div role="radiogroup" class="ngcx-form__fields ngcx-height--auto">
+          <c-ngcx_-radio-buttons-cmp
+            onradiovaluechange={handleRadiobuttonEvent}
+            value={radioUSResidentSelectedValue}
+            options={usResidentOptions}>
+          </c-ngcx_-radio-buttons-cmp>
+        </div>
+      </div>
+    </template>
+  </div>
+
+  <!-- Continue Button — FIX 7: Removed disabled={disabled}; JS manages disabled state directly -->
+  <div data-id="divButtonBlock" class="ngcx-page-button ngcx-margin-top--auto ngcx-btn-margin">
+    <button data-id="btnContinuePersonal" class="ngcx-btn ngcx-btn--primary"
+      onclick={handleContinue} disabled>
+      Continue
+    </button>
+    <div class="ngcx-spacer--height"></div>
+  </div>
+
+  <!-- SJP Plan Modal — FIX 8: Updated to lwc:if syntax -->
+  <template lwc:if={isModalOpen}>
+    <section role="dialog" tabindex="-1"
+      aria-labelledby="modal-heading-01" aria-modal="true"
+      aria-describedby="modal-content-id-1"
+      class="slds-modal slds-fade-in-open"
+      data-id="sectionSjpPlanModal"
+      onkeydown={handleSjpModalKeyDown}>
+      <div class="slds-modal__container">
+        <div class="ngcx-modal__wrapper">
+          <header class="slds-modal__header ngcx-modal__header">
+            <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate ngcx-heading">
+              SJP plan number
+            </h2>
+            <button type="button" data-id="btnCloseModal" class="ngcx-btn ngcx-btn--close"
+              onclick={closeModal} aria-label="Close SJP Plan popup">
+              <img src={icon_cross} class="ngcx-icon--default" alt="" />
+            </button>
+          </header>
+          <div class="slds-modal__content slds-p-around_medium ngcx-modal__body" id="modal-content-id-1">
+            <p class="ngcx-text-body ngcx-marginbottom--0x">
+              You can find your plan numbers on your Annual Wealth Account statement.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+    <div class="slds-backdrop ngcx-modal__backdrop"></div>
+  </template>
+</template>
